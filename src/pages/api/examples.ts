@@ -1,4 +1,5 @@
 import { type NextApiRequest, type NextApiResponse } from "next";
+import { string } from "zod";
 
 import { prisma } from "../../server/db/client";
 
@@ -7,4 +8,5 @@ const examples = async (req: NextApiRequest, res: NextApiResponse) => {
   res.status(200).json(examples);
 };
 
-export default examples;
+
+// export default examples;

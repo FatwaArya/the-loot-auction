@@ -7,4 +7,5 @@ export const authRouter = router({
   getSecretMessage: protectedProcedure.query(() => {
     return "you can now see this secret message!";
   }),
+
 });

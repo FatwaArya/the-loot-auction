@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap');/* add local font */
+@font-face {
+    font-family: "SilkSerif";
+    font-style: normal;
+    font-weight: 700;
+    src: url(/fonts/SilkSerif-Black.ttf) format("truetype");
+  }
+
+
+
+
+  @layer base {
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+  }
