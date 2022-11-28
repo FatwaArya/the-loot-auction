@@ -23,7 +23,7 @@ export default function dashboard() {
   const merchantId = userData?.user?.id as string;
 
   return (
-    <div className="flex h-screen flex-col items-center justify-center gap-4 ">
+    <div className="flex flex-col items-center justify-center gap-4 ">
       <p className="text-center text-2xl ">
         {userData && <span>Logged in as {userData.user?.name}</span>}
         {userData && <span>{userData.user?.id}</span>}

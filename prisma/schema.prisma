@@ -78,7 +78,7 @@ model MerchantItems {
   status      Status         @default(AVAILABLE)
   updatedAt   DateTime       @updatedAt
   User        User?          @relation(fields: [userId], references: [id])
-  userId      String?        @unique()
+  userId      String?
   OwnedItems  OwnedItems[]
 }
 

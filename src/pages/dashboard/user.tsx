@@ -24,6 +24,7 @@ export default function dashboard() {
 
   const userId = userData?.user?.id as string;
   const updateUserRole = trpc.user.updateRole.useMutation();
+  const getAllItem = trpc.items.getAll.useQuery();
   // if user is merchant redirect to merchant dashboard
   return (
     <div className="flex flex-col items-center justify-center gap-4">
@@ -93,6 +94,28 @@ export default function dashboard() {
           </form>
         </div>
       </div>
+      {getAllItem.data && (
+        <div className="bg-primary-500 card w-96 shadow-xl">
+          <div className="card-body items-center text-center">
+            <h2>Items</h2>
+            <div className="flex flex-col gap-4">
+              {getAllItem.data.map((item) => (
+                <div key={item.id}>
+                  <p>{item.itemName}</p>
+                  <p>{item.price}</p>
+                  <Image
+                    src={item.image || ""}
+                    width={100}
+                    height={100}
+                    alt={`Auction item for ${item.itemName}`}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       <button
         className="rounded-full bg-white/10 px-10 py-3 font-semibold text-white no-underline transition hover:bg-white/20"
         onClick={userData ? () => signOut() : () => signIn()}

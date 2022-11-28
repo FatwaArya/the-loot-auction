@@ -35,7 +35,7 @@ export const Navbar = ({
               <button
                 className=" px-10 py-3 font-semibold text-black no-underline transition hover:bg-white/20"
                 onClick={() => {
-                  Router.push("/auth/login");
+                  Router.push("/auth/signin");
                 }}
               >
                 Login

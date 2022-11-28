@@ -26,10 +26,9 @@ export const ItemForm = ({ merchantId }: { merchantId: string }) => {
             <p>{item.description}</p>
             <Image
               src={item.image as string}
-              width={100}
-              height={100}
-              className="rounded-full"
-              alt="User avatar"
+              width={250}
+              height={250}
+              alt={`Auction item for ${item.itemName}`}
             />
           </div>
         ))}
