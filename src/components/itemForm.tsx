@@ -1,39 +1,20 @@
-// import supabase
-import { toast } from "react-toastify";
+"use client";
+import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { supabase } from "../utils/supabase";
 import { trpc } from "../utils/trpc";
-import Image from "next/image";
-import Head from "next/head";
-
+import Notify from "./notification";
 //userData as a prop session
 
 export const ItemForm = ({ merchantId }: { merchantId: string }) => {
   const createItem = trpc.items.newItems.useMutation();
-  const itemsByMerchant = trpc.items.merchantItems.useQuery({
-    merchantId: merchantId,
-  });
+  const [loading, setLoading] = useState(createItem.isLoading);
 
   return (
     <>
-      <Head>
-        <title>Merchant dashboard</title>
-      </Head>
       <div>
-        {itemsByMerchant.data?.map((item) => (
-          <div key={item.id}>
-            <p>{item.itemName}</p>
-            <p>{item.price}</p>
-            <p>{item.description}</p>
-            <Image
-              src={item.image as string}
-              width={250}
-              height={250}
-              alt={`Auction item for ${item.itemName}`}
-            />
-          </div>
-        ))}
-
-        <div className="space-y-6 ">
+        <div className="">
           <div className=" px-4 py-5 shadow sm:rounded-lg sm:p-6">
             <div className="md:grid md:grid-cols-3 md:gap-6">
               <div className="md:col-span-1">
@@ -55,18 +36,16 @@ export const ItemForm = ({ merchantId }: { merchantId: string }) => {
                       itemName: { value: string };
                       description: { value: string };
                       price: { value: string };
-                      quantity: { value: string };
                       itemImage: { files: FileList };
                     };
                     const itemName = target.itemName.value;
                     const description = target.description.value;
                     const price = target.price.value;
-                    const quantity = target.quantity.value;
                     const itemImage = target.itemImage.files[0] as File;
 
                     const { data, error } = await supabase.storage
                       .from("item-image")
-                      .upload(itemName, itemImage);
+                      .upload(itemName + merchantId, itemImage);
 
                     if (error) {
                       toast.error(error.message);
@@ -74,7 +53,7 @@ export const ItemForm = ({ merchantId }: { merchantId: string }) => {
 
                     const itemImageUrl = supabase.storage
                       .from("item-image")
-                      .getPublicUrl(itemName);
+                      .getPublicUrl(itemName + merchantId);
 
                     const imageUrl = itemImageUrl.data.publicUrl;
                     //parse price to int
@@ -84,16 +63,22 @@ export const ItemForm = ({ merchantId }: { merchantId: string }) => {
                         name: itemName,
                         description,
                         price: parseInt(price),
-                        quantity: parseInt(quantity),
                         image: imageUrl,
                         merchantId,
                       },
                       {
                         onSuccess: () => {
-                          toast.success("Item created");
+                          return (
+                            <Notify
+                              messageHead="Item Created"
+                              messageBody="Item is on display now!"
+                              show={true}
+                            />
+                          );
                         },
-                        onError: (error) => {
-                          toast.error(error.message);
+                        onError: (e) => {
+                          // longer toast duration
+                          toast.error(e.message);
                         },
                       }
                     );
@@ -151,17 +136,23 @@ export const ItemForm = ({ merchantId }: { merchantId: string }) => {
                         >
                           Price
                         </label>
-                        <input
-                          type="number"
-                          name="price"
-                          id="price"
-                          min={0}
-                          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm"
-                        />
+                        <div className="relative mt-1 rounded-md shadow-sm">
+                          <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                            <span className="text-gray-500 sm:text-sm">$</span>
+                          </div>
+                          <input
+                            type="number"
+                            name="price"
+                            id="price"
+                            className="block w-full rounded-md border-gray-300 pl-7 pr-12 focus:border-primary focus:ring-primary sm:text-sm"
+                            placeholder="0.00"
+                            min={0}
+                          />
+                        </div>
                       </div>
 
                       <div className="col-span-6 sm:col-span-3 lg:col-span-2">
-                        <label
+                        {/* <label
                           htmlFor="quantity"
                           className="block text-sm font-medium text-gray-700"
                         >
@@ -173,7 +164,7 @@ export const ItemForm = ({ merchantId }: { merchantId: string }) => {
                           id="quantity"
                           min={0}
                           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary  sm:text-sm"
-                        />
+                        /> */}
                       </div>
                     </div>
                   </div>
@@ -221,18 +212,49 @@ export const ItemForm = ({ merchantId }: { merchantId: string }) => {
                     </div>
                   </div>
                   <div className="flex justify-end">
-                    <button
-                      type="button"
-                      className="rounded-md border border-gray-300 bg-white py-2 px-4 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                    >
-                      Cancel
-                    </button>
+                    {/* set loading to true when sending using mutation */}
                     <button
                       type="submit"
-                      className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-primary py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2"
-                    >
-                      Save
-                    </button>
+                      className="inline-flex justify-center rounded-md border border-transparent bg-secondary py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-primary hover:text-black focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      disabled={loading}
+                    ></button>
+
+                    {/* {createItem.isLoading === true ? (
+                      <button
+                        type="submit"
+                        className="inline-flex justify-center rounded-md border border-transparent bg-primary py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                      >
+                        <svg
+                          className="-ml-1 mr-3 h-5 w-5 animate-spin text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx={12}
+                            cy={12}
+                            r={10}
+                            stroke="currentColor"
+                            strokeWidth={4}
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v1a7 7 0 00-7 7h1z"
+                          />
+                        </svg>
+                        Loading
+                      </button>
+                    ) : (
+                      <button
+                        type="submit"
+                        className="ml-3 inline-flex justify-center rounded-md border border-transparent bg-secondary py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-primary hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-secondary focus:ring-offset-2"
+                      >
+                        Save
+                      </button>
+                    )} */}
+                    <ToastContainer />
                   </div>
                 </form>
               </div>

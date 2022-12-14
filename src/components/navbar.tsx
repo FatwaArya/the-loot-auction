@@ -1,11 +1,16 @@
 //make component
 
-import React from "react";
+import React, { Fragment } from "react";
 import Router from "next/router";
-import { trpc } from "../utils/trpc";
 import Head from "next/head";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import { Menu, Transition } from "@headlessui/react";
+import Link from "next/link";
+
+function classNames(...classes: string[]) {
+  return classes.filter(Boolean).join(" ");
+}
 
 export const Navbar = ({
   role,
@@ -33,91 +38,108 @@ export const Navbar = ({
             {/* if doesnt login show login button */}
             {!profileSrc ? (
               <button
-                className=" px-10 py-3 font-semibold text-black no-underline transition hover:bg-white/20"
                 onClick={() => {
                   Router.push("/auth/signin");
                 }}
+                className="inline-flex items-center rounded-md border border-transparent bg-secondary px-4 py-2 text-base font-medium text-white shadow-sm hover:text-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               >
                 Login
               </button>
             ) : (
               <div>
-                <label tabIndex={0} className="btn-ghost btn-circle avatar btn">
-                  <div className="w-15 rounded-full">
-                    {profileSrc && (
-                      <Image
-                        src={profileSrc}
-                        width={250}
-                        height={250}
-                        alt="User avatar"
-                      />
-                    )}{" "}
+                {/* Profile dropdown */}
+                <Menu as="div" className="relative ml-3">
+                  <div>
+                    <Menu.Button className="flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                      <span className="sr-only">Open user menu</span>
+                      {profileSrc && (
+                        <Image
+                          src={profileSrc}
+                          width={250}
+                          height={250}
+                          alt="User avatar"
+                          className="h-12 w-12 rounded-full"
+                        />
+                      )}{" "}
+                    </Menu.Button>
                   </div>
-                </label>
-                <ul
-                  tabIndex={0}
-                  className="dropdown-content menu rounded-box menu-compact mt-3 w-52 bg-base-100 p-2 shadow"
-                >
-                  <li className="disabled text-primary">
-                    <span className="lowercase ">{role}</span>
-                  </li>
-                  <li>
-                    {/* button redirect to dashboard according to role */}
-                    {role === "MERCHANT" ? (
-                      <button
-                        onClick={() => Router.push("/dashboard/merchant")}
-                      >
-                        Dashboard
-                      </button>
-                    ) : (
-                      <button onClick={() => Router.push("/dashboard/user")}>
-                        Dashboard
-                      </button>
-                    )}
-                  </li>
-                  <li>
-                    <a>Settings</a>
-                  </li>
-                  <li>
-                    <button
-                      onClick={() => {
-                        signOut();
-                      }}
-                    >
-                      Logout
-                    </button>
-                  </li>
-                </ul>
+                  <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-100"
+                    enterFrom="transform opacity-0 scale-95"
+                    enterTo="transform opacity-100 scale-100"
+                    leave="transition ease-in duration-75"
+                    leaveFrom="transform opacity-100 scale-100"
+                    leaveTo="transform opacity-0 scale-95"
+                  >
+                    <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                      <div className=" px-4 py-2">
+                        <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium lowercase text-green-800">
+                          {role}
+                        </span>
+                      </div>
+
+                      <Menu.Item>
+                        {({ active }) =>
+                          // use
+                          role === "MERCHANT" ? (
+                            <Link
+                              href="/dashboard/merchant"
+                              className={classNames(
+                                active ? "bg-gray-100" : "",
+                                "block px-4 py-2 text-sm text-gray-700"
+                              )}
+                            >
+                              Dashboard{" "}
+                            </Link>
+                          ) : (
+                            <Link
+                              href="/dashboard/user"
+                              className={classNames(
+                                active ? "bg-gray-100" : "",
+                                "block px-4 py-2 text-sm text-gray-700"
+                              )}
+                            >
+                              Dashboard{" "}
+                            </Link>
+                          )
+                        }
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <a
+                            href="#"
+                            className={classNames(
+                              active ? "bg-gray-100" : "",
+                              "block px-4 py-2 text-sm text-gray-700"
+                            )}
+                          >
+                            Settings
+                          </a>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            onClick={() => {
+                              signOut();
+                            }}
+                            className={classNames(
+                              active ? "bg-gray-100" : "",
+                              "block py-2 pl-4 pr-[122px] text-sm text-gray-700"
+                            )}
+                          >
+                            Sign out
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </Menu.Items>
+                  </Transition>
+                </Menu>
               </div>
             )}
           </div>
         </div>
-        {/* <div className="flex flex-row items-center">
-          <ul className="menu menu-compact menu-horizontal flex p-0 ">
-            <li tabIndex={0}>
-              {role ? (
-                <button
-                  className="btn-outline btn rounded px-4 font-montserrat text-black "
-                  onClick={() => {
-                    signOut();
-                    Router.push("/");
-                  }}
-                >
-                  Sign out
-                </button>
-              ) : (
-                <button
-                  className="btn-outline btn rounded px-4 font-montserrat text-black"
-                  onClick={() => {
-                    Router.push("/auth/login");
-                  }}
-                >
-                  Sign in
-                </button>
-              )}
-            </li>
-          </ul>
-        </div> */}
       </div>
     </>
   );

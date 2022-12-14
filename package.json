@@ -27,12 +27,13 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-icons": "^4.6.0",
-    "react-toastify": "^9.1.1",
+    "react-toastify": "^8.1.0",
     "superjson": "1.9.1",
     "zod": "^3.18.0"
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.5.3",
+    "@tailwindcss/aspect-ratio": "^0.4.2",
     "@types/node": "^18.0.0",
     "@types/react": "^18.0.14",
     "@types/react-dom": "^18.0.5",

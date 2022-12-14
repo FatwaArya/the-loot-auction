@@ -31,13 +31,13 @@ const getBaseUrl = () => {
 
 export const trpc = createTRPCNext<AppRouter>({
   config({ ctx }) {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       // during client requests
       return {
         transformer: superjson, // optional - adds superjson serialization
         links: [
           httpBatchLink({
-            url: '/api/trpc',
+            url: "/api/trpc",
           }),
         ],
       };
@@ -72,7 +72,7 @@ export const trpc = createTRPCNext<AppRouter>({
               return {
                 ...headers,
                 // Optional: inform server that it's an SSR request
-                'x-ssr': '1',
+                "x-ssr": "1",
               };
             }
             return {};
@@ -81,7 +81,7 @@ export const trpc = createTRPCNext<AppRouter>({
       ],
     };
   },
-  ssr: true,
+  ssr: false,
 });
 /**
  * Inference helper for inputs
